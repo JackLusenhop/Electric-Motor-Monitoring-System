@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "MotorScan",
-    "slug": "MotorScan",
+    "slug": "electric-motor-monitoring-system",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,6 +25,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1f5a7d41-309a-4ced-9726-07d11c43a042"
+      }
+    },
+    "owner": "jacklusenhop"
   }
 }
