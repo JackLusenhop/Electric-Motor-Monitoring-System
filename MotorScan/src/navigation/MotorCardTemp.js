@@ -2,18 +2,19 @@ import React from "react";
 import { useNavigation } from "@react-navigation/native";
 import { TouchableOpacity, View, Text, StyleSheet } from "react-native";
 
-const Card = ({ motorName, location, status }) => {
+const Card = ({ id, motorName, location, serialNumber }) => {
 	const nav = useNavigation();
 
 	return (
 		<TouchableOpacity
 			style={styles.container}
 			activeOpacity={0.8}
-			onPress={() => nav.navigate("MotorView")}
+			onPress={() => nav.navigate("MotorView", {id})}
 		>
 			<View style={styles.card}>
-				<Text style={styles.title}>Motor Name</Text>
-				<Text style={styles.content}>Location: Sector A</Text>
+				<Text style={styles.title}>{motorName}</Text>
+				<Text style={styles.content}>Location: {location}</Text>
+				<Text style={styles.content}>Serial Number: {serialNumber}</Text>
 				<Text style={styles.content}>Status: Good</Text>
 			</View>
 		</TouchableOpacity>

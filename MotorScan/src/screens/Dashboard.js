@@ -1,22 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { Alert, View, TextInput, Text, StyleSheet, ScrollView, Platform } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
 import { Dimensions } from "react-native";
 
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../config/FirebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, onSnapshot } from "firebase/firestore";
 
 import CustomInput from "../components/CustomInput";
 import CustomButton from "../components/CustomButton";
 import MotorCardTemp from "../navigation/MotorCardTemp";
 
-const auth = FIREBASE_AUTH;
+const auth = FIREBASE_AUTH; 
 const db = FIREBASE_DB;
 
 const NewMotor = () => {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [name, setName] = useState("");
+	const [motorList, setMotorList] = useState([]);
 
 	const nav = useNavigation();
 
@@ -25,7 +26,10 @@ const NewMotor = () => {
 		nav.navigate("MotorView");
 	};
 
+	
+
 	useEffect(() => {
+		
 		const fetchUserName = async () => {
 			const docRef = doc(FIREBASE_DB, "users", FIREBASE_AUTH.currentUser.uid);
 			const docSnap = await getDoc(docRef);
@@ -37,11 +41,28 @@ const NewMotor = () => {
 				console.log("No such document!");
 			}
 		};
-
-		const fetchMotors = async () => {};
-
 		fetchUserName();
-		fetchMotors();
+
+		//const fetchMotors = async () => {
+		//const motorsCollectionRef = collection(FIREBASE_DB, "users", FIREBASE_AUTH.currentUser.uid, "motors");
+		
+		//const motorSnap = await getDocs(motorsCollectionRef);
+		const unsubscribe = onSnapshot(collection(FIREBASE_DB, "users", FIREBASE_AUTH.currentUser.uid, "motors"), (motorSnap) => 
+		{
+			motors = [];
+			motorSnap.forEach((doc) => {
+				motor = doc.data();
+				motors.push({id: doc.id, location: motor.location, name: motor.motorName, serial: motor.motorSerial});
+				console.log(doc.id);
+			});
+			setMotorList(motors);
+		}); 
+			
+	 
+		//fetchMotors();
+
+		return () => unsubscribe();
+
 	}, []);
 	const containerPadding = () => {
 		const screenWidth = Dimensions.get("window").width;
@@ -82,13 +103,9 @@ const NewMotor = () => {
 
 			{/* ScrollView & render all the motors list */}
 			<ScrollView showsVerticalScrollIndicator={false}>
-				<MotorCardTemp />
-				<MotorCardTemp />
-				<MotorCardTemp />
-				<MotorCardTemp />
-				<MotorCardTemp />
-				<MotorCardTemp />
-				<MotorCardTemp />
+				{motorList.map((motor, index) => (
+					<MotorCardTemp key={motor.serial} id={motor.id} location={motor.location} motorName={motor.name} serialNumber={motor.serial}/>
+				))}
 			</ScrollView>
 
 			{/* <CustomButton text="Temp motor card" onPress={ontempbuttonpressed} /> */}
