@@ -9,6 +9,8 @@ import {
 } from 'lucide-react-native';
 import { FIREBASE_AUTH, FIREBASE_DB } from '../../config/FirebaseConfig';
 import { collection, onSnapshot } from 'firebase/firestore';
+import { LineChart } from "react-native-chart-kit";
+import { Dropdown } from 'react-native-element-dropdown';
 
 const MotorView = ({ route }) => {
   const motorId = route.params.id;
@@ -83,6 +85,61 @@ const MotorView = ({ route }) => {
   const airflows = [130, 131, 132, 133, 134, 135, 136, 137, 138, 139];
   const vibrations = [40, 41, 42, 43, 44, 45, 46, 47, 48, 49];
 
+  const [dropValy, setDropValy] = useState(null);
+  const [dropValx, setDropValx] = useState(null);
+  const [unit, setUnit] = useState('°C"');
+  const [datay, setDatay] = useState(temps);
+  const [datax, setDatax] = useState(times);
+
+  useEffect(() => {
+    if (dropValx === "Temperature") {
+      setDatax(temps);
+    } else if (dropValx === "Power") {
+      setDatax(powers);
+    } else if (dropValx === "Humidity") {
+      setDatax(humidities);
+    } else if (dropValx === "Airflow") {
+      setDatax(airflows);
+    } else if (dropValx === "Vibration") {
+      setDatax(vibrations);
+    } else if (dropValx === "Time") {
+      setDatax(times);
+    }
+  }, [dropValx]);
+
+  useEffect(() => {
+    if (dropValy === "Temperature") {
+      setUnit("°C");
+      setDatay(temps);
+    } else if (dropValy === "Power") {
+      setUnit("W");
+      setDatay(powers);
+    } else if (dropValy === "Humidity") {
+      setUnit("%");
+      setDatay(humidities);
+    } else if (dropValy === "Airflow") {
+      setUnit("CFM");
+      setDatay(airflows);
+    } else if (dropValy === "Vibration") {
+      setUnit("Hz");
+      setDatay(vibrations);
+    } else if (dropValy === "Time") {
+      setUnit("s");
+      setDatay(times);
+    }else {
+      setUnit("");
+    }
+  }, [dropValy]);
+  //const [isFocus, setIsFocus] = useState(false);
+  const dropdownItems = [
+    {label: "Time", value: 'Time'},
+    {label: "Temperature", value: 'Temperature'},
+    {label: "Power", value: 'Power'},
+    {label: "Humidity", value: 'Humidity'},
+    {label: "Airflow", value: 'Airflow'},
+    {label: "Vibration", value: 'Vibration'},
+  ];
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
@@ -154,10 +211,89 @@ const MotorView = ({ route }) => {
             </View>
           </View>
         </View>
+
+        <View style={styles.infoCard}>
+          <Text style={styles.infoTitle}>Graph</Text>
+        
+
+        <View style={styles.infoContent}>
+
+          <View style={{padding: 10}}>
+            <Text style={{textDecorationLine: "underline", marginBottom: 10}}>X-axis</Text>
+            <Dropdown
+              style={styles.dropdown}
+              itemContainerStyle={styles.itemContainerStyle}
+              itemTextStyle={styles.itemTextStyle}
+              placeholderStyle={styles.placeholderStyle}
+              selectedTextStyle={styles.selectedTextStyle}
+              data={dropdownItems}
+              maxHeight={300}
+              labelField="label"
+              valueField="value"
+              placeholder="Time"
+              value={dropValx}
+              onChange={item => {
+                setDropValx(item.value);
+              }}
+            />
+          </View>
+          
+          <View style={{padding: 10, marginBottom: 10}}>
+            <Text style={{textDecorationLine: "underline", marginBottom: 10}}>Y-axis</Text>
+            <Dropdown
+            style={styles.dropdown}
+            itemContainerStyle={styles.itemContainerStyle}
+            itemTextStyle={styles.itemTextStyle}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            data={dropdownItems}
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder="Temperature"
+            value={dropValy}
+            onChange={item => {
+              setDropValy(item.value);
+            }}
+          />
+          </View>
+
+          <LineChart
+            data={{
+              labels: datax,
+              datasets: [
+                {
+                  data: datay
+                }
+              ]
+            }}
+            width={Dimensions.get("window").width * 0.8}
+            height={200}
+            yAxisSuffix={unit} //units
+            chartConfig={{
+              backgroundColor: "#ffffff",
+              backgroundGradientFrom: "#ffffff",
+              backgroundGradientTo: "#ffffff",
+              //decimalPlaces: 2, // optional, defaults to 2dp
+              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              /*style: {
+                borderRadius: 16
+              },
+              }
+              /*propsForDots: {
+                r: "6",
+                strokeWidth: "2",
+                stroke: "#ffa726"
+              }*/
+            }}
+          />
+        </View>
       </View>
+      </View>   
     </ScrollView>
 
-    //add graphs here
+
   );
 };
 
@@ -290,6 +426,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
 	  color: '#ef4444',
 	  fontWeight: '500',
+  },
+  dropdown: {
+    height: 30,
+    borderBottomWidth: 0.5,
+    backgroundColor: 'white',
+  },
+  placeholderStyle: {
+    fontSize: 12,
+  },
+  selectedTextStyle: {
+    fontSize: 12,
+  },
+  itemContainerStyle: {
+    height: 50,
+    padding: 1,
+  },
+  itemTextStyle: {
+    fontSize: 10,
   }
   });
 
