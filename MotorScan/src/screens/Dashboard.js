@@ -119,7 +119,7 @@ const unsubscribe = onSnapshot(
     return (
       <TouchableOpacity
         style={styles.motorCard}
-        onPress={() => nav.navigate("MotorView", { id })}
+        onPress={() => nav.navigate("MotorView", { id, status })}
         activeOpacity={0.7}
       >
         <View style={styles.motorCardHeader}>

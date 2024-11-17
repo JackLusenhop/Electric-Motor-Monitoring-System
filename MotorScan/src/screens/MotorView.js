@@ -12,6 +12,7 @@ import { collection, onSnapshot } from 'firebase/firestore';
 
 const MotorView = ({ route }) => {
   const motorId = route.params.id;
+  const status = route.params.status;
   const [motorData, setMotorData] = useState({
     power: 'N/A',
     temp: 'N/A',
@@ -74,6 +75,14 @@ const MotorView = ({ route }) => {
   const airflowValue = motorData.airflow.split(' ')[0];
   const vibrationValue = motorData.vibration;
 
+  // dummy graph data 
+  const times = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const temps = [30, 31, 32, 33, 34, 35, 36, 37, 38, 39];
+  const powers = [300, 301, 302, 303, 304, 305, 306, 307, 308, 309];
+  const humidities = [70, 71, 72, 73, 74, 75, 76, 77, 78, 79];
+  const airflows = [130, 131, 132, 133, 134, 135, 136, 137, 138, 139];
+  const vibrations = [40, 41, 42, 43, 44, 45, 46, 47, 48, 49];
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
@@ -129,7 +138,7 @@ const MotorView = ({ route }) => {
           <View style={styles.infoContent}>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Status</Text>
-              <Text style={styles.infoValueSuccess}>Operational</Text>
+              <Text style={(status === "Operational" ? styles.infoValueSuccess : (status === "Warning" ? styles.infoValueWarning : styles.infoValueError))}>{status}</Text>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>Runtime</Text>
@@ -147,6 +156,8 @@ const MotorView = ({ route }) => {
         </View>
       </View>
     </ScrollView>
+
+    //add graphs here
   );
 };
 
@@ -270,6 +281,16 @@ const styles = StyleSheet.create({
 	  color: '#22C55E',
 	  fontWeight: '500',
 	},
+  infoValueWarning: {
+    fontSize: 14,
+	  color: '#f59e0b',
+	  fontWeight: '500',
+  },
+  infoValueError: {
+    fontSize: 14,
+	  color: '#ef4444',
+	  fontWeight: '500',
+  }
   });
 
 export default MotorView;
